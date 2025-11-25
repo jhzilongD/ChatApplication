@@ -1,6 +1,8 @@
 package com.seudjh.chatapplication.authenticationservice.controller;
 
 import com.seudjh.chatapplication.authenticationservice.common.Result;
+import com.seudjh.chatapplication.authenticationservice.data.user.common.updateAvatar.UpdateAvatarRequest;
+import com.seudjh.chatapplication.authenticationservice.data.user.common.updateAvatar.UpdateAvatarResponse;
 import com.seudjh.chatapplication.authenticationservice.data.user.login.LoginRequest;
 import com.seudjh.chatapplication.authenticationservice.data.user.login.LoginResponse;
 import com.seudjh.chatapplication.authenticationservice.data.user.loginCode.LoginCodeRequest;
@@ -8,13 +10,11 @@ import com.seudjh.chatapplication.authenticationservice.data.user.loginCode.Logi
 import com.seudjh.chatapplication.authenticationservice.data.user.register.RegisterRequest;
 import com.seudjh.chatapplication.authenticationservice.data.user.register.RegisterResponse;
 import com.seudjh.chatapplication.authenticationservice.service.UserService;
+import com.seudjh.chatapplication.authenticationservice.utils.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
@@ -40,5 +40,14 @@ public class UserController {
     public Result<LoginCodeResponse> login(@RequestBody LoginCodeRequest loginCodeRequest) {
         LoginCodeResponse response = userService.loginCode(loginCodeRequest);
         return Result.OK(response);
+    }
+
+    @PatchMapping("/avatar")
+    public Result<UpdateAvatarResponse> updateAvatar(@Valid @RequestBody UpdateAvatarRequest updateAvatarRequest,
+                                                     @RequestHeader String Authorization) throws Exception {
+        String id = JwtUtil.getUserIdFromToken(Authorization);
+        UpdateAvatarResponse updateAvatarResponse = userService.updateAvatar(id, updateAvatarRequest);
+
+        return Result.OK(updateAvatarResponse);
     }
 }

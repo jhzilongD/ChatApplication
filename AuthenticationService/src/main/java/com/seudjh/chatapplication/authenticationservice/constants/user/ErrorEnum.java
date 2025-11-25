@@ -9,8 +9,10 @@ public enum ErrorEnum {
     REGISTER_ERROR(40001, "注册失败,用户已经存在"),
     LOGIN_ERROR(40003, "登陆异常"),
     CODE_ERROR(40002, "验证码错误"),
+    NO_USER_ERROR(40004, "用户不存在"),
     // 500 服务端异常
-    SYSTEM_ERROR(50001, "服务端异常");
+    SYSTEM_ERROR(50001, "服务端异常"),
+    UPDATE_AVATAR_ERROR(50002, "更新头像失败");
 
     private final int code;
     private final String message;

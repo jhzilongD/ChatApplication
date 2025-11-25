@@ -1,5 +1,6 @@
 package com.seudjh.chatapplication.authenticationservice.utils;
 
+import com.seudjh.chatapplication.authenticationservice.constants.config.ConfigEnum;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -7,24 +8,25 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
     @Value("${jwt.secret}")
-    private String secret;
+    private static String secret;
 
     @Value("${jwt.expiration}")
-    private Long expiration; // 过期时间（秒）
+    private static Long expiration; // 过期时间（秒）
 
     // 生成 Token
-    public String generateToken(String username) {
+    public static String generateToken(String userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration * 1000);
 
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userId)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, secret)
@@ -32,7 +34,7 @@ public class JwtUtil {
     }
 
     // 验证 Token
-    public boolean validateToken(String token) {
+    public static boolean validateToken(String token) {
         try {
             Jwts.parser()
                     .setSigningKey(secret)
@@ -43,8 +45,8 @@ public class JwtUtil {
         }
     }
 
-    // 从 Token 中获取用户名
-    public String getUsernameFromToken(String token) {
+    // 从 Token 中获取用户id
+    public static String getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
@@ -54,13 +56,13 @@ public class JwtUtil {
     }
 
     // 检查 Token 是否过期
-    public boolean isTokenExpired(String token) {
+    public static boolean isTokenExpired(String token) {
         Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
     // 获取过期时间
-    private Date getExpirationDateFromToken(String token) {
+    private static Date getExpirationDateFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
