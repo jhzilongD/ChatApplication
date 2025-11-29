@@ -1,0 +1,41 @@
+package com.seudjh.chatapplication.authenticationservice.conf;
+
+
+import com.alibaba.fastjson.JSON;
+
+import com.seudjh.chatapplication.authenticationservice.common.Result;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
+
+@Component
+@Slf4j
+public class SourceHandler implements HandlerInterceptor {
+
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String header = request.getHeader("X-Request-Source");
+
+        if (!"InfiniteChat-GateWay".equals(header)) {
+            refuseResult(response);
+            return false;
+        }
+        return true;
+
+    }
+
+    private void refuseResult(HttpServletResponse httpServletResponse) throws Exception{
+        httpServletResponse.setContentType("text/html;charset=UTF-8");
+        httpServletResponse.setCharacterEncoding("UTF-8");
+        httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
+        Result<Object> result = new Result<>().setCode(40301).setMsg("非法请求来源");
+        httpServletResponse.getWriter().print(JSON.toJSONString(result));
+        httpServletResponse.getWriter().flush();
+
+    }
+}

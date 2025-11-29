@@ -12,6 +12,9 @@
         <module>
             AuthenticationService
         </module>
+        <module>
+            GateWay
+        </module>
     </modules>
 
 </project>
