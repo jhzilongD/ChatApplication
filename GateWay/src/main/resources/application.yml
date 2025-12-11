@@ -46,7 +46,7 @@ spring:
         #          predicates:
         #            - Header=X-Request-Id, \d+
 
-        # ??????
+        # 登陆认证服务
         - id: AuthenticationService
 #          uri: lb://AuthenticationService
           uri: http://localhost:8082
@@ -57,3 +57,16 @@ spring:
             - AddRequestHeader=X-Request-Source, InfiniteChat-GateWay
             - AddResponseHeader=X-Response-Source, InfiniteChat-GateWay
 
+        # 实时通信服务
+        - id: RealTimeCommunicationService
+          uri: lb://RealTimeCommunicationService
+          # uri: http://localhost:8083
+          predicates:
+            - Path=/api/v1/message/**
+
+        # Netty长链接服务 （为什么LB的方式会出错？）
+        - id: NettyService
+          uri: ws://127.0.0.1:9001
+#          uri: ws://NettyService
+          predicates:
+            - Path=/api/v1/netty

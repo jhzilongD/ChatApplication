@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,11 +15,20 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
     private static String secret;
+    private static Long expiration;
+
+    @Value("${jwt.secret}")
+    private String secretNonStatic;
 
     @Value("${jwt.expiration}")
-    private static Long expiration; // 过期时间（秒）
+    private Long expirationNonStatic;
+
+    @PostConstruct
+    public void init() {
+        JwtUtil.secret = this.secretNonStatic;
+        JwtUtil.expiration = this.expirationNonStatic;
+    }
 
     // 生成 Token
     public static String generateToken(String userId) {

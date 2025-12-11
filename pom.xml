@@ -18,6 +18,9 @@
         <module>
             RealTimeCommunicationService
         </module>
+        <module>
+            MessageingService
+        </module>
     </modules>
 
 </project>

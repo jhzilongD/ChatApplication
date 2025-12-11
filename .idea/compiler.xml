@@ -15,9 +15,10 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
+        <module name="RealTimeCommunicationService" />
         <module name="AuthenticationService" />
         <module name="GateWay" />
-        <module name="RealTimeCommunicationService" />
+        <module name="MessageingService" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -29,6 +30,7 @@
       <module name="AuthenticationService" options="-parameters" />
       <module name="AuthenticationService (1)" options="" />
       <module name="GateWay" options="-parameters" />
+      <module name="MessageingService" options="-parameters" />
       <module name="RealTimeCommunicationService" options="-parameters" />
     </option>
   </component>
