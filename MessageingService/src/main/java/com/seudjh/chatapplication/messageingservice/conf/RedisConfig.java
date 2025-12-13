@@ -42,6 +42,8 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+
+
     public RedisSerializer<Object> redisSerializer() {
         //创建JSON序列化器
         ObjectMapper objectMapper = new ObjectMapper();

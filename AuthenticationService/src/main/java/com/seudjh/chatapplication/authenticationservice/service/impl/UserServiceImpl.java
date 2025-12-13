@@ -17,7 +17,9 @@ import com.seudjh.chatapplication.authenticationservice.data.user.register.Regis
 import com.seudjh.chatapplication.authenticationservice.exception.CodeException;
 import com.seudjh.chatapplication.authenticationservice.exception.DatabaseException;
 import com.seudjh.chatapplication.authenticationservice.exception.UserException;
+import com.seudjh.chatapplication.authenticationservice.mapper.UserBalanceMapper;
 import com.seudjh.chatapplication.authenticationservice.model.User;
+import com.seudjh.chatapplication.authenticationservice.model.UserBalance;
 import com.seudjh.chatapplication.authenticationservice.service.UserService;
 import com.seudjh.chatapplication.authenticationservice.mapper.UserMapper;
 import com.seudjh.chatapplication.authenticationservice.utils.JwtUtil;
@@ -27,6 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
 * @author seudmax
@@ -40,6 +45,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private StringRedisTemplate redisTemplate;
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserBalanceMapper userBalanceMapper;
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -60,7 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String encryptedPassword = DigestUtils.md5DigestAsHex(password.getBytes());
 
         User user = new User().
-                setUserId(String.valueOf(snowflake.nextId())).
+                setUserId(snowflake.nextId()).
                 setPassword(encryptedPassword).
                 setPhone(phone).
                 setUserName(NickNameGenaratorUtil.generateNickName());
@@ -68,6 +76,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         boolean isUserSave = this.save(user);
         if (!isUserSave){
             throw new DatabaseException("数据库异常，保存用户信息失败");
+        }
+
+        UserBalance userBalance = new UserBalance()
+                .setUserId(user.getUserId())
+                .setBalance(BigDecimal.valueOf(1000))
+                .setUpdatedAt(LocalDateTime.now());
+
+        int insert = userBalanceMapper.insert(userBalance);
+        if (insert <= 0){
+            throw new DatabaseException("数据库异常，创建用户账户信息错误");
         }
 
         return new RegisterResponse().setPhone(phone);
@@ -88,7 +106,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         LoginResponse loginResponse = new LoginResponse();
         BeanUtils.copyProperties(user, loginResponse);
 
-        String to = jwtUtil.generateToken(user.getUserId());
+        String to = jwtUtil.generateToken(String.valueOf(user.getUserId()));
         loginResponse.setToken(to);
         return loginResponse;
     }
@@ -113,7 +131,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         LoginCodeResponse response = new LoginCodeResponse();
         BeanUtils.copyProperties(user, response);
 
-        String to = jwtUtil.generateToken(user.getUserId());
+        String to = jwtUtil.generateToken(String.valueOf(user.getUserId()));
         response.setToken(to);
         return response;
     }

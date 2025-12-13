@@ -105,8 +105,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         // 4.通过redis查询接受者的netty服务在哪,发消息
         sendRealTimeMessage(sendMsgRequest, appMessage, createdAt);
         //
-
-
         return buildResponseMsgVo(appMessage);
     }
 
